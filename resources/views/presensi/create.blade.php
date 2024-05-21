@@ -35,7 +35,7 @@
 <!-- App Capsule -->
 <div class="row" style="margin-top: 60px">
     <div class="col">
-        <input type="hidden" id="lokasi">
+        <input type="text" id="lokasi">
         <div class="webcam-capture"></div>
     </div>
 </div>
@@ -85,21 +85,38 @@
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
     }
 
-    function successCallback(position){
-        lokasi.value = position.coords.latitude + "," + position.coords.longitude;
-        var map = L.map('map').setView([0, 0], 20);
+    function successCallback(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        lokasi.value = latitude + ", " + longitude;
+        
+        var map = L.map('map');
+
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-         maxZoom: 18,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            maxZoom: 20,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
-        // marker
-        var marker = L.marker([0, 0]).addTo(map);
-        var circle = L.circle([0, 0], {
+
+        // marker at the current position
+        var marker = L.marker([latitude, longitude]).addTo(map);
+        
+        // circle at the given coordinates
+        var circle = L.circle([-6.895292, 107.6394147], {
             color: 'red',
             fillColor: '#f03',
             fillOpacity: 0.5,
-            radius: 15
+            radius: 20
         }).addTo(map);
+
+        // Create a bounding box that includes both the marker and the circle
+        var bounds = L.latLngBounds([
+            // [latitude, longitude],          // marker position
+            [latitude, longitude],          // marker position
+            [-6.895292, 107.6394147]        // circle position
+        ]);
+
+        // Adjust the map view to fit the bounding box
+        map.fitBounds(bounds);
     }
 
     function errorCallback(){
@@ -113,60 +130,52 @@
         var lokasi = $("#lokasi").val();
         
         $.ajax({
-            type:'POST',
-            url:'/presensi/store',
-            data:{
-                _token:"{{ csrf_token() }}",
-                image:image,
-                lokasi:lokasi
-            },
-            cache:false,
-            success:function(respond){
-                // var status = respond.split("|");
-                if(respond.message === 'Data presensi berhasil disimpan.'){
-                    notifikasi_in.play();
-                    Swal.fire({
-                        title: "Berhasil!",
-                        text: "Terima Kasih & Selamat Bekerja",
-                        icon: "success",
-                        confirmButtonText: "kembali"
-                        
-                    })
-                    setTimeout("location.href='/dashboard'", 3000);
-                } else if(respond.message === 'Data presensi berhasil diupdate.') {
-                    notifikasi_out.play();
-                    Swal.fire({
-                        title: "Berhasil!",
-                        text: "Terima Kasih & Hati - hati di jalan!",
-                        icon: "success",
-                        confirmButtonText: "kembali"
-                    })
-                    setTimeout("location.href='/dashboard'", 3000);
-                } else if (respond.message === 'Anda diluar jangkauan. Tidak dapat melanjutkan.') {
-                    notifikasi_failed.play();
-                    Swal.fire({
-                        title: "Error",
-                        text: "Anda diluar jangkauan. Tidak dapat melanjutkan.",
-                        icon: "error",
-                        confirmButtonText: "kembali"
-                    })
-                } else if (respond.message === 'Maaf, sistem mungkin sedang error. Harap hubungi teknisi.') {
-                    notifikasi_failed.play();
-                    Swal.fire({
-                        title: "Error",
-                        text: "Maaf, sistem mungkin sedang error. Harap hubungi teknisi.",
-                        icon: "error",
-                        confirmButtonText: "kembali"
-                    })
-                    setTimeout("location.href='/dashboard'", 3000);
-                }
-                alert("Nilai radius: " + $radius);
-            },
-            error: function(xhr, status, error) {
+    type: 'POST',
+    url: '/presensi/store',
+    data: {
+        _token: "{{ csrf_token() }}",
+        image: image,
+        lokasi: lokasi
+    },
+    cache: false,
+    success: function(respond) {
+        var status = respond.split("|");
+        if (status[0] == "success") {
+            if (status[2] == "in") {
+                notifikasi_in.play();
+                Swal.fire({
+                    title: "Berhasil!",
+                    text: status[1],
+                    icon: "success",
+                    confirmButtonText: "kembali"
+                });
+                setTimeout("location.href='/dashboard'", 3000);
+            } else if (status[2] == "out") {
+                notifikasi_out.play();
+                Swal.fire({
+                    title: "Terupdate!",
+                    text: status[1],
+                    icon: "success",
+                    confirmButtonText: "kembali"
+                });
+                setTimeout("location.href='/dashboard'", 3000);
+            }
+            } else {
+                Swal.fire({
+                    title: "Gagal!",
+                    text: status[1],
+                    icon: "error",
+                    confirmButtonText: "kembali"
+                });
+                // setTimeout("location.href='/dashboard'", 3000);
+            }
+            alert("Nilai radius: " + $radius);
+        },
+        error: function(xhr, status, error) {
             console.error(xhr.responseText);
             alert('Error occurred while processing request: ' + xhr.responseText);
-            },
-        });
+        },
+    });
         console.log(image);
     });
 

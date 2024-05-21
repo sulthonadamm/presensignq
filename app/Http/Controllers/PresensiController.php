@@ -38,61 +38,73 @@ public function store(Request $request){
     $longitudeuser = $lokasiuser[1];
     $jarak = $this->distance($latitudekantor, $longitudekantor, $latitudeuser, $longitudeuser);
     $radius = round($jarak["meters"]);
-    // if ($radius > 15) {
-    //     return response()->json(['message' => 'Anda diluar jangkauan. Tidak dapat melanjutkan.'], 400);
-    // }
     $image = $request->image;
     $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
     $formatName = $nik . "-" . $tgl_presensi . "-" . str_replace(':', '-', $jam);
     $fileName = $formatName . '.png';
     $cek = DB::table('presensi')->where('tgl_presensi', $harini)->where('nik', $nik)->count();
 
-    if ($cek > 0) {
-        $data_pulang = [
-            'jam_out' => $jam,
-            'foto_out' => $fileName,
-            'lokasi_out' => $lokasi
-        ];
-        $update = DB::table('presensi')->where('tgl_presensi', $tgl_presensi)->where('nik', $nik)->update($data_pulang);
-
-        if ($update) {
-            Storage::put('public/absensi/' . $fileName, $image_data);
-            return response()->json(['message' => 'Data presensi berhasil diupdate.']);
+    // Hanya menyimpan gambar jika tidak ada kesalahan dan dalam jangkauan
+    if ($radius <= 15) {
+        // User is within the acceptable range
+        if ($cek > 0) {
+            $data_pulang = [
+                'jam_out' => $jam,
+                'foto_out' => $fileName,
+                'lokasi_out' => $lokasi
+            ];
+            $update = DB::table('presensi')->where('tgl_presensi', $tgl_presensi)->where('nik', $nik)->update($data_pulang);
+    
+            if ($update) {
+                echo "success|Data presensi berhasil diupdate & jarak anda adalah " . $radius . " meter|out";
+            } else {
+                echo "error|Gagal mengupdate data presensi|out";
+            }
         } else {
-            return response()->json(['message' => 'Gagal mengupdate data presensi.'], 500);
+            $data = [
+                'nik' => $nik,
+                'tgl_presensi' => $tgl_presensi,
+                'jam_in' => $jam,
+                'foto_in' => $fileName,
+                'lokasi_in' => $lokasi
+            ];
+            $simpan = DB::table('presensi')->insert($data);
+            if ($simpan) {
+                echo "success|Data presensi berhasil disimpan & jarak anda adalah " . $radius . " meter|in";
+            } else {
+                echo "error|Gagal menyimpan data presensi|in";
+            }
         }
     } else {
-        $data = [
-            'nik' => $nik,
-            'tgl_presensi' => $tgl_presensi,
-            'jam_in' => $jam,
-            'foto_in' => $fileName,
-            'lokasi_in' => $lokasi
-        ];
-        $simpan = DB::table('presensi')->insert($data);
-
-        if ($simpan) {
-            Storage::put('public/absensi/' . $fileName, $image_data);
-            return response()->json(['message' => 'Data presensi berhasil disimpan.']);
-        } else {
-            return response()->json(['message' => 'Gagal menyimpan data presensi.'], 500);
-        }
+        // User is outside the acceptable range
+        echo "error|Anda sedang diluar, jangkauan jarak anda " . $radius . " meter menuju kantor|";
     }
 }
-
+    
     //untuk menghitung jarak koordinat
     function distance($lat1, $lon1, $lat2, $lon2)
     {
-        $theta = $lon1 - $lon2;
-        $miles = (sin(deg2rad($lat1)) * sin(deg2rad($lat2))) + (cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)));
-        $miles = acos($miles);
-        $miles = rad2deg($miles);
-        $miles = $miles * 60 * 1.1515;
-        $feet = $miles * 5280;
-        $yards = $feet / 3;
-        $kilometers = $miles * 1.609344;
-        $meters = $kilometers * 1000;
+        // Konversi derajat ke radian
+        $lat1 = deg2rad($lat1);
+        $lon1 = deg2rad($lon1);
+        $lat2 = deg2rad($lat2);
+        $lon2 = deg2rad($lon2);
+
+        // Haversine formula
+        $dlat = $lat2 - $lat1;
+        $dlon = $lon2 - $lon1;
+
+        $a = sin($dlat / 2) * sin($dlat / 2) +
+            cos($lat1) * cos($lat2) * 
+            sin($dlon / 2) * sin($dlon / 2);
+        $c = 2 * asin(sqrt($a));
+
+        // Radius Bumi dalam meter
+        $r = 6371000;
+
+        // Hitung jarak dalam meter
+        $meters = $c * $r;
+
         return compact('meters');
     }
-
 }
