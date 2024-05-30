@@ -38,14 +38,18 @@ public function store(Request $request){
     $longitudeuser = $lokasiuser[1];
     $jarak = $this->distance($latitudekantor, $longitudekantor, $latitudeuser, $longitudeuser);
     $radius = round($jarak["meters"]);
+    $cek = DB::table('presensi')->where('tgl_presensi', $harini)->where('nik', $nik)->count();
+    if($cek > 0){
+        $ket = "out";
+    } else {
+        $ket = "in";
+    }
     $image = $request->image;
     $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
-    $formatName = $nik . "-" . $tgl_presensi . "-" . str_replace(':', '-', $jam);
+    $formatName = $nik . "-" . $tgl_presensi . "-" . $ket;
     $fileName = $formatName . '.png';
-    $cek = DB::table('presensi')->where('tgl_presensi', $harini)->where('nik', $nik)->count();
-
-    if ($radius > 15) {
-        echo "error|Anda sedang diluar, jangkauan jarak anda " . $radius . " meter menuju kantor|";
+    // if ($radius > 15) {
+    //     echo "error|Anda sedang diluar, jangkauan jarak anda " . $radius . " meter menuju kantor|";
         if ($cek > 0) {
             $data_pulang = [
                 'jam_out' => $jam,
@@ -79,7 +83,7 @@ public function store(Request $request){
                 
             }
         }
-    }
+    // }
 }
     
     //untuk menghitung jarak koordinat
