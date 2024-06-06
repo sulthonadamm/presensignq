@@ -101,7 +101,7 @@
         var marker = L.marker([latitude, longitude]).addTo(map);
         
         // circle at the given coordinates
-        var circle = L.circle([-6.895292, 107.6394147], {
+        var circle = L.circle([latitude, longitude], {
             color: 'red',
             fillColor: '#f03',
             fillOpacity: 0.5,
@@ -112,7 +112,7 @@
         var bounds = L.latLngBounds([
             // [latitude, longitude],          // marker position
             [latitude, longitude],          // marker position
-            [-6.895292, 107.6394147]        // circle position
+            [latitude, longitude]        // circle position
         ]);
 
         // Adjust the map view to fit the bounding box

@@ -38,6 +38,9 @@ public function store(Request $request){
     $longitudeuser = $lokasiuser[1];
     $jarak = $this->distance($latitudekantor, $longitudekantor, $latitudeuser, $longitudeuser);
     $radius = round($jarak["meters"]);
+    // if ($radius > 20) {
+    //     return "error|Jarak Anda terlalu jauh dari kantor, ($radius)|";
+    // }
     $cek = DB::table('presensi')->where('tgl_presensi', $harini)->where('nik', $nik)->count();
     if($cek > 0){
         $ket = "out";
@@ -48,42 +51,34 @@ public function store(Request $request){
     $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
     $formatName = $nik . "-" . $tgl_presensi . "-" . $ket;
     $fileName = $formatName . '.png';
-    // if ($radius > 15) {
-    //     echo "error|Anda sedang diluar, jangkauan jarak anda " . $radius . " meter menuju kantor|";
-        if ($cek > 0) {
-            $data_pulang = [
-                'jam_out' => $jam,
-                'foto_out' => $fileName,
-                'lokasi_out' => $lokasi
-            ];
-            $update = DB::table('presensi')->where('tgl_presensi', $tgl_presensi)->where('nik', $nik)->update($data_pulang);
-
-            if ($update) {
-                Storage::put('public/absensi/' . $fileName, $image_data);
+    if ($cek > 0) {
+        $data_pulang = [
+            'jam_out' => $jam,
+            'foto_out' => $fileName,
+            'lokasi_out' => $lokasi
+        ];             $update = DB::table('presensi')->where('tgl_presensi', $tgl_presensi)->where('nik', $nik)->update($data_pulang);
+          if ($update) {
+            Storage::put('public/absensi/' . $fileName, $image_data);
                 echo "success|Data presensi berhasil diupdate|out";
-            } else {
-                echo "error|Gagal mengupdate data presensi|out";
-            }
         } else {
-            $data = [
-                'nik' => $nik,
-                'tgl_presensi' => $tgl_presensi,
-                'jam_in' => $jam,
-                'foto_in' => $fileName,
-                'lokasi_in' => $lokasi
-            ];
-            $simpan = DB::table('presensi')->insert($data);
-
-            if ($simpan) {
-                Storage::put('public/absensi/' . $fileName, $image_data);
-                echo "success|Data presensi berhasil disimpan|in";
-                
-            } else {
-                echo "error|Gagal menyimpan data presensi|in";
-                
-            }
+            echo 1;
         }
-    // }
+    } else {
+        $data = [
+            'nik' => $nik,
+            'tgl_presensi' => $tgl_presensi,
+            'jam_in' => $jam,
+            'foto_in' => $fileName,
+            'lokasi_in' => $lokasi
+        ];
+        $simpan = DB::table('presensi')->insert($data);
+        if ($simpan) {
+            echo "success|Terima Kasih, Selamat Bekerja|in";
+            Storage::put('public/absensi/' . $fileName, $image_data);
+        } else {
+            echo 1;
+        }
+    }
 }
     
     //untuk menghitung jarak koordinat
@@ -99,5 +94,10 @@ public function store(Request $request){
         $kilometers = $miles * 1.609344;
         $meters = $kilometers * 1000;
         return compact('meters');
+    }
+
+    public function editprofile(){
+
+        return view('presensi.editprofile');
     }
 }

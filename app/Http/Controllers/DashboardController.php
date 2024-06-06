@@ -16,6 +16,7 @@ class DashboardController extends Controller
         $presensihariini = DB::table('presensi')->where('nik', $nik)->where('tgl_presensi', $harini)->first();
         $historibulanini = DB::table('presensi')->whereRaw('MONTH(tgl_presensi)="' . $bulanini . '"')
             ->whereRaw('YEAR(tgl_presensi)="' . $tahunini . '"')
+            ->where('nik', $nik)
             ->orderBy('tgl_presensi')
             ->get();
             

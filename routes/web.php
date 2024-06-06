@@ -32,7 +32,10 @@ Route::middleware(['auth:karyawan'])->group(function(){
     Route::get('/proseslogout', [AuthController::class, 'proseslogout']);
 
     //presensi
+    Route::get('/presensi/create',[PresensiController::class, 'create']);
+    Route::post('/presensi/store', [PresensiController::class, 'store']);
+
+    //editprofile
+    Route::get('/editprofile', [PresensiController::class,'editprofile']);
 });
-Route::get('/presensi/create',[PresensiController::class, 'create']);
-Route::post('/presensi/store', [PresensiController::class, 'store']);
 
