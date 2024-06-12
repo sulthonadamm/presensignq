@@ -130,44 +130,44 @@
         var lokasi = $("#lokasi").val();
         
         $.ajax({
-    type: 'POST',
-    url: '/presensi/store',
-    data: {
-        _token: "{{ csrf_token() }}",
-        image: image,
-        lokasi: lokasi
-    },
-    cache: false,
-    success: function(respond) {
+        type: 'POST',
+        url: '/presensi/store',
+        data: {
+            _token: "{{ csrf_token() }}",
+            image: image,
+            lokasi: lokasi
+        },
+        cache: false,
+        success: function(respond) {
         var status = respond.split("|");
-        if (status[0] == "success") {
-            if (status[2] == "in") {
-                notifikasi_in.play();
-                Swal.fire({
-                    title: "Berhasil!",
-                    text: status[1],
-                    icon: "success",
-                    confirmButtonText: "kembali"
-                });
-                setTimeout("location.href='/dashboard'", 3000);
-            } else if (status[2] == "out") {
-                notifikasi_out.play();
-                Swal.fire({
-                    title: "Terupdate!",
-                    text: status[1],
-                    icon: "success",
-                    confirmButtonText: "kembali"
-                });
-                setTimeout("location.href='/dashboard'", 3000);
-            }
-            } else {
-                Swal.fire({
-                    title: "Gagal!",
-                    text: status[1],
-                    icon: "error",
-                    confirmButtonText: "kembali"
-                });
-                // setTimeout("location.href='/dashboard'", 3000);
+            if (status[0] == "success") {
+                if (status[2] == "in") {
+                    notifikasi_in.play();
+                    Swal.fire({
+                        title: "Berhasil!",
+                        text: status[1],
+                        icon: "success",
+                        confirmButtonText: "kembali"
+                    });
+                    setTimeout("location.href='/dashboard'", 3000);
+                } else if (status[2] == "out") {
+                    notifikasi_out.play();
+                    Swal.fire({
+                        title: "Terupdate!",
+                        text: status[1],
+                        icon: "success",
+                        confirmButtonText: "kembali"
+                    });
+                    setTimeout("location.href='/dashboard'", 3000);
+                }
+                } else {
+                    Swal.fire({
+                        title: "Gagal!",
+                        text: status[1],
+                        icon: "error",
+                        confirmButtonText: "kembali"
+                    });
+                    // setTimeout("location.href='/dashboard'", 3000);
             }
             alert("Nilai radius: " + $radius);
         },

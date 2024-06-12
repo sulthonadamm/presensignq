@@ -29,7 +29,7 @@
     </div>
     <!-- * loader -->
 
-    <!-- @yield ('header'); -->
+    @yield ('header')
 
     <!-- App Capsule -->
     <div id="appCapsule">

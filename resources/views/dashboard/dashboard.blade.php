@@ -5,7 +5,14 @@
         <div class="section" id="user-section">
             <div id="user-detail">
                 <div class="avatar">
-                    <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">
+                    @if (Auth::guard('karyawan')->user()->foto)
+                    @php
+                        $path = Storage::url('karyawan/' . Auth::guard('karyawan')->user()->foto)
+                    @endphp
+                    <img src="{{ url($path) }}" alt="avatar" class="imaged w64 rounded" style="height: 60px">
+                    @else
+                    <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">    
+                    @endif
                 </div>
                 <div id="user-info">
                     <h2 id="user-name">{{ Auth::guard('karyawan')->user()->nama_lengkap}}</h2>
@@ -108,7 +115,7 @@
                                 {{ $rekappresensi->jmlhadir }}
                                 </span>
                                 <ion-icon name="accessibility-outline" class="text-success" style="font-size: 1.7rem"></ion-icon>
-                                <br><span style="font-size: 0.8rem; font-weight: 500">Hadir</span>
+                                <br><span style="font-size: 0.6rem; font-weight: 600">Hadir</span>
                             </div>
                         </div>
                     </div>
@@ -117,7 +124,7 @@
                             <div class="card-body text-center" style="padding: 16px 12px !important">
                                 <span class="badge bg-danger" style="position: absolute; top: 6px; right: 8px; font-size: 0.7rem; z-index:999">0</span>
                                 <ion-icon name="hand-left-outline" class="text-primary" style="font-size: 1.7rem"></ion-icon>
-                                <br><span style="font-size: 0.8rem; font-weight: 500">Izin</span>
+                                <br><span style="font-size: 0.6rem; font-weight: 600">Izin</span>
                             </div>
                         </div>
                     </div>
@@ -126,7 +133,7 @@
                             <div class="card-body text-center" style="padding: 16px 12px !important">
                                 <span class="badge bg-danger" style="position: absolute; top: 6px; right: 8px; font-size: 0.7rem; z-index:999">0</span>
                                 <ion-icon name="bag-add-outline" class="text-warning" style="font-size: 1.7rem"></ion-icon>
-                                <br><span style="font-size: 0.8rem; font-weight: 500">Sakit</span>
+                                <br><span style="font-size: 0.6rem; font-weight: 600">Sakit</span>
                             </div>
                         </div>
                     </div>
@@ -137,7 +144,7 @@
                                 {{ $rekappresensi->jmlterlambat }}
                                 </span>
                                 <ion-icon name="time-outline" class="text-danger" style="font-size: 1.7rem"></ion-icon>
-                                <br><span style="font-size: 0.8rem; font-weight: 500">Terlambat</span>
+                                <br><span style="font-size: 0.6rem; font-weight: 600">Terlambat</span>
                             </div>
                         </div>
                     </div>
