@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         // \App\Models\Karyawan::factory(10)->create();
         $this->call([
             KaryawanSeeder::class,
-            // PresensiSeeder::class,
+            PresensiSeeder::class,
         ]);
     }
 }

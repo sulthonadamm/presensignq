@@ -47,7 +47,7 @@
             </div>
             <div class="form-group boxed">
                 <div class="input-wrapper">
-                    <input type="password" class="form-control" value="" name="password" placeholder="Password" autocomplete="off">
+                    <input type="password" class="form-control" name="password" placeholder="Password" autocomplete="off">
                 </div>
             </div>
             <div class="custom-file-upload" id="fileUpload1">

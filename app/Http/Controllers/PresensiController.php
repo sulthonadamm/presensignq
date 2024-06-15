@@ -105,32 +105,29 @@ public function store(Request $request){
         return view('presensi.editprofile', compact('karyawan'));
     }
 
-    public function updateprofile(Request $request){
+    public function updateprofile(Request $request) {
         $nik = Auth::guard('karyawan')->user()->nik;
         $nama_lengkap = $request->nama_lengkap;
         $no_hp = $request->no_hp;
-        $password = Hash::make($request->password);
-        $karyawan = DB::table('karyawan')->where('nik', $nik) ->first();
-        if($request->hasFile('foto')){
+    
+        $karyawan = DB::table('karyawan')->where('nik', $nik)->first();
+    
+        if ($request->hasFile('foto')) {
             $foto = $nik . "." . $request->file('foto')->getClientOriginalExtension();
         } else {
             $foto = $karyawan->foto;
         }
-        if(empty($password)) {
-            $data = [
-                'nama_lengkap' => $nama_lengkap,
-                'no_hp' => $no_hp,
-                'foto' => $foto
-            ];
-        } else {
-            $data = [
-                'nama_lengkap' => $nama_lengkap,
-                'no_hp' => $no_hp,
-                'password' => $password,
-                'foto' => $foto
-            ];
+    
+        $data = [
+            'nama_lengkap' => $nama_lengkap,
+            'no_hp' => $no_hp,
+            'foto' => $foto
+        ];
+    
+        if ($request->has('password') && !empty($request->password)) {
+            $data['password'] = Hash::make($request->password);
         }
-        
+    
         $update = DB::table('karyawan')->where('nik', $nik)->update($data);
         if($update){
             if($request->hasFile('foto')){

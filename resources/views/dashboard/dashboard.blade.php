@@ -3,21 +3,28 @@
 @section("content")
 <div id="appCapsule">
         <div class="section" id="user-section">
-            <div id="user-detail">
-                <div class="avatar">
-                    @if (Auth::guard('karyawan')->user()->foto)
-                    @php
-                        $path = Storage::url('karyawan/' . Auth::guard('karyawan')->user()->foto)
-                    @endphp
-                    <img src="{{ url($path) }}" alt="avatar" class="imaged w64 rounded" style="height: 60px">
-                    @else
-                    <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">    
-                    @endif
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="user-detail">
+                    <div class="avatar">
+                        @if (Auth::guard('karyawan')->user()->foto)
+                        @php
+                            $path = Storage::url('karyawan/' . Auth::guard('karyawan')->user()->foto)
+                        @endphp
+                        <img src="{{ url($path) }}" alt="avatar" class="imaged w64 rounded" style="height: 60px">
+                        @else
+                        <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">    
+                        @endif
+                    </div>
+                    <div id="user-info">
+                        <h2 id="user-name">{{ Auth::guard('karyawan')->user()->nama_lengkap}}</h2>
+                        <span id="user-role">{{ Auth::guard('karyawan')->user()->jabatan}}</span>
+                    </div>
                 </div>
-                <div id="user-info">
-                    <h2 id="user-name">{{ Auth::guard('karyawan')->user()->nama_lengkap}}</h2>
-                    <span id="user-role">{{ Auth::guard('karyawan')->user()->jabatan}}</span>
-                </div>
+                <div class="menu-icon ms-auto">
+                    <a href="/proseslogout" class="" style="font-size: 30px">
+                        <ion-icon name="log-out-outline" class="text-light"></ion-icon>
+                    </a>
+                </div>  
             </div>
         </div>
 
